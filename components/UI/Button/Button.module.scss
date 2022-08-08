@@ -1,0 +1,17 @@
+.button {
+    padding: 15px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 30px;
+    border: 0;
+    background-color: #E90070;
+    transition: all .2s ease-out;
+    color: #fff;
+    text-align: center;
+    width: 100%;
+
+    &:hover {
+        background: lighten(#E90070, 7%);
+        transition: all .2s ease-in;
+    }
+}

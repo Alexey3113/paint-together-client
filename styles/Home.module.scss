@@ -1,0 +1,57 @@
+.container {
+  width: 600px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+
+  p {
+
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 50px;
+    text-align: center;
+    color: #FFFFFF;
+    margin-bottom: 50px;
+
+  }
+
+  h1 {
+
+    font-weight: 700;
+    font-size: 52px;
+    line-height: 63px;
+    text-align: center;
+    color: #FFFFFF;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    margin-bottom: 50px;
+
+  }
+}
+
+.startGameButton {
+  background: #E90070;
+  border-radius: 30px;
+  font-weight: 500;
+  font-size: 28px;
+  line-height: 34px;
+  text-align: center;
+  color: #FFFFFF;
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  outline: none;
+  padding: 15px 25px;
+  border: 0;
+  cursor: pointer;
+  filter: drop-shadow(0px 11px 4px #AD0656);
+  transition: all .2s ease-out;
+
+  &:hover {
+    filter: drop-shadow(0px 11px 4px lighten(#AD0656, 7%));
+    background: lighten(#E90070, 7%);
+    transition: all .2s ease-in;
+  }
+}
