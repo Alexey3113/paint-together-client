@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useCallback, useState } from 'react'
 import ModalWrapper from './ModalWrapper'
 
 import styles from "./Modal.module.scss"
@@ -19,9 +19,9 @@ const NicknameModal: React.FC<IProps> = ({isModalOpen, setIsModalOpen, callbackB
       setFieldValue(e.target.value)
   }
 
-  const handleBtnClick = (e: any) => {
+  const handleBtnClick = useCallback((e: any) => {
       callbackBtnClick(fieldValue)
-  }
+  }, [fieldValue])
 
   return (
     <ModalWrapper title='Введите ваше имя' isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>

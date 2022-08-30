@@ -36,9 +36,9 @@ const Game: NextPage = () => {
         mes: "-1",
         userName: "-1",
     });
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(true)
-    const [nickName, setNickname] = useState<string>("")
-    const [nowColor, setNowColor] = useState<string>("#F4352BFF")
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
+    const [nickName, setNickname] = useState<string>("");
+    const [nowColor, setNowColor] = useState<string>("#F4352BFF");
 
     const socketRef = React.useRef<Socket>();
     let canvasRef = React.useRef<CanvasRenderingContext2D>();
@@ -52,12 +52,12 @@ const Game: NextPage = () => {
 
             socketRef.current.emit("joinRoom", router.query.id);
 
-            socketRef.current.on("painting", handleTakeAndPaintDataFromUser);
+            socketRef.current.on("painting", asyncTakeAndPaintDataFromUser);
             socketRef.current.on("clearing_picture", () =>
                 canvasRef?.current?.clearRect(0, 0, 1000, 600)
             );
-            socketRef.current.on("get_message", handleTakeMessageFromUser);
-            socketRef.current.on("init_img", handleTakeImg);
+            socketRef.current.on("get_message", asyncTakeMessageFromUser);
+            socketRef.current.on("init_img", asyncTakeImg);
             socketRef.current.emit("init_img", router.query.id);
 
             // return () => {
@@ -88,38 +88,45 @@ const Game: NextPage = () => {
         [socketRef.current, canvasRef.current]
     );
 
-    const handleTakeAndPaintDataFromUser = useCallback(
-        ({ x, y, dx, dy, color }: ICanvasCoords) => {
-            if (canvasRef.current) {
-                canvasRef.current.strokeStyle = color;
-                canvasRef.current.beginPath();
-                canvasRef.current.moveTo(x, y);
-                canvasRef.current.lineTo(x - dx, y - dy);
-                canvasRef.current.stroke();
-                canvasRef.current.closePath();
-                setNowColor(color)
-            }
-        },
-        [canvasRef.current]
-    );
+    const asyncTakeAndPaintDataFromUser = ({
+        x,
+        y,
+        dx,
+        dy,
+        color,
+    }: ICanvasCoords) => {
+        if (canvasRef.current) {
+            canvasRef.current.strokeStyle = color;
+            canvasRef.current.beginPath();
+            canvasRef.current.moveTo(x, y);
+            canvasRef.current.lineTo(x - dx, y - dy);
+            canvasRef.current.stroke();
+            canvasRef.current.closePath();
+            setNowColor(color);
+        }
+    };
 
     const handleSendMessageToUsers = useCallback(() => {
         if (socketRef.current) {
             if (messageValue) {
-                setMessages([...messages, { mes: messageValue, userName: "Вы" }]);
-                socketRef.current.emit("send_message", { mes: messageValue, userName: nickName });
+                setMessages([
+                    ...messages,
+                    { mes: messageValue, userName: "Вы" },
+                ]);
+                socketRef.current.emit("send_message", {
+                    mes: messageValue,
+                    userName: nickName,
+                });
                 setMessageValue("");
             }
         }
     }, [messageValue, messageValue, socketRef.current]);
 
-    const handleTakeMessageFromUser = useCallback(
-        ({ mes, userName }: IMessage) => {
-            setNewAddedMessage({ mes, userName });
-        },
-        [messages]
-    );
-    const handleTakeImg = useCallback((data: any) => {
+    const asyncTakeMessageFromUser = ({ mes, userName }: IMessage) => {
+        setNewAddedMessage({ mes, userName });
+    };
+
+    const asyncTakeImg = (data: any) => {
         const img = new Image();
         img.src = data;
         img.onload = () => {
@@ -127,7 +134,8 @@ const Game: NextPage = () => {
                 canvasRef.current.drawImage(img, 0, 0, 1000, 600);
             }
         };
-    }, []);
+    };
+
     const handleSendImg = useCallback(
         (ref: HTMLCanvasElement | null) => {
             if (socketRef.current && canvasRef.current && ref) {
@@ -155,14 +163,10 @@ const Game: NextPage = () => {
         },
         [messageValue]
     );
-    const callbackBtnClick = useCallback(
-        (e: string) => {
-            console.log("Нажали")
-            setNickname(e)
-            setIsModalOpen(false)
-        },
-        []
-    );
+    const callbackBtnClick = useCallback((e: string) => {
+        setNickname(e);
+        setIsModalOpen(false);
+    }, []);
 
     useEffect(() => {
         if (newAddedMessage.userName !== "-1") {
@@ -203,7 +207,10 @@ const Game: NextPage = () => {
                             value={messageValue}
                             type="text"
                         />
-                        <Button title="Отправить" onClick={handleSendMessageToUsers} />                            
+                        <Button
+                            title="Отправить"
+                            onClick={handleSendMessageToUsers}
+                        />
                     </div>
                 </div>
 
@@ -221,7 +228,11 @@ const Game: NextPage = () => {
                     />
                 </div>
             </div>
-            <NicknameModal setIsModalOpen={setIsModalOpen} isModalOpen={isModalOpen} callbackBtnClick={callbackBtnClick} />
+            <NicknameModal
+                setIsModalOpen={setIsModalOpen}
+                isModalOpen={isModalOpen}
+                callbackBtnClick={callbackBtnClick}
+            />
         </>
     );
 };

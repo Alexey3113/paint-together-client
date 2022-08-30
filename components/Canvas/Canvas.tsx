@@ -18,7 +18,7 @@ interface ICanvasProps {
     sendImage: (ref: HTMLCanvasElement | null) => void;
     nowColor: string;
     setNowColor: React.Dispatch<React.SetStateAction<string>>;
-    canvasContainer: React.RefObject<HTMLDivElement>
+    canvasContainer: React.RefObject<HTMLDivElement>;
 }
 
 export const Canvas: React.FC<ICanvasProps> = ({
@@ -28,38 +28,36 @@ export const Canvas: React.FC<ICanvasProps> = ({
     sendImage,
     nowColor,
     setNowColor,
-    canvasContainer
+    canvasContainer,
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    
+
     let context: any = "";
 
     const router: NextRouter = useRouter();
 
-    const handleChangeColor = useCallback(
-        (color: string) => {
-            context.strokeStyle = color;
-            setNowColor(color);
-        },
-        [context]
-    );
+    const handleChangeColor = (color: string) => {
+        context.strokeStyle = color;
+        setNowColor(color);
+    };
 
-    const handleCopyLink = useCallback(() => {
+    const handleCopyLink = () => {
         navigator.clipboard.writeText(
             `${process.env.NEXT_PUBLIC_CLIENT_URL}/game/${router.query.id}`
         );
         alert("Ссылка скопирована");
-    }, [router, process.env]);
+    };
 
-    const handleChangeColorToEraser = useCallback(() => {
+    const handleChangeColorToEraser = () => {
         context.strokeStyle = "white";
         setNowColor("white");
-    }, [context]);
-    const handleClear = useCallback(() => {
+    };
+
+    const handleClear = () => {
         if (canvasRef.current) {
             clearPicture(canvasRef.current);
         }
-    }, [canvasRef]);
+    };
 
     const colors = useMemo(
         () => [
@@ -96,22 +94,36 @@ export const Canvas: React.FC<ICanvasProps> = ({
     );
 
     useEffect(() => {
-        console.log("canvasContainer", )
+        console.log("canvasContainer");
         if (!context && canvasRef?.current) {
             context = canvasRef?.current?.getContext("2d");
             onInit(context);
             const img = new Image();
-            let containerHeight: number = 1000, containerWidth: number = 600;
-            if(canvasContainer.current){
-                containerHeight = canvasContainer?.current?.getBoundingClientRect().height > 600 ? 600 : Number(canvasContainer?.current?.getBoundingClientRect().height) - 80
-                containerWidth = canvasContainer?.current?.getBoundingClientRect().width > 1000 ? 1000 : Number(canvasContainer?.current?.getBoundingClientRect().width) - 60
+            let containerHeight: number = 1000,
+                containerWidth: number = 600;
+            if (canvasContainer.current) {
+                containerHeight =
+                    canvasContainer?.current?.getBoundingClientRect().height >
+                    600
+                        ? 600
+                        : Number(
+                              canvasContainer?.current?.getBoundingClientRect()
+                                  .height
+                          ) - 80;
+                containerWidth =
+                    canvasContainer?.current?.getBoundingClientRect().width >
+                    1000
+                        ? 1000
+                        : Number(
+                              canvasContainer?.current?.getBoundingClientRect()
+                                  .width
+                          ) - 60;
             }
             img.src = "";
             img.onload = () => {
                 context.drawImage(img, 0, 0, containerWidth, containerHeight);
             };
-            // 
-            
+            //
 
             canvasRef.current.height = containerHeight;
             canvasRef.current.width = containerWidth;
@@ -131,28 +143,24 @@ export const Canvas: React.FC<ICanvasProps> = ({
 
     return (
         <>
-                <canvas
-                    className={styles.root}
-                    ref={canvasRef}
-                    id="paint"
-                ></canvas>
-                <div className={styles.colors}>
-                    {colors.map((el: string, i: number) => (
-                        <div
-                            key={i}
-                            style={{ background: el }}
-                            className={`${styles.colorsItem} ${
-                                nowColor === el ? styles.activeItem : ""
-                            }`}
-                            onClick={() => handleChangeColor(el)}
-                        ></div>
-                    ))}
-                    <span onClick={handleClear}>Очистить Полотно</span>
-                    <span onClick={handleChangeColorToEraser}>
-                        Использовать Ластик
-                    </span>
-                    <span onClick={handleCopyLink}>Пригласить друзей</span>
-                </div>
+            <canvas className={styles.root} ref={canvasRef} id="paint"></canvas>
+            <div className={styles.colors}>
+                {colors.map((el: string, i: number) => (
+                    <div
+                        key={i}
+                        style={{ background: el }}
+                        className={`${styles.colorsItem} ${
+                            nowColor === el ? styles.activeItem : ""
+                        }`}
+                        onClick={() => handleChangeColor(el)}
+                    ></div>
+                ))}
+                <span onClick={handleClear}>Очистить Полотно</span>
+                <span onClick={handleChangeColorToEraser}>
+                    Использовать Ластик
+                </span>
+                <span onClick={handleCopyLink}>Пригласить друзей</span>
+            </div>
         </>
     );
 };
